@@ -152,17 +152,20 @@ function new_game()
   function game:game_mousemoved(x, y)
     local map_x, map_y = math.ceil(x / 30), math.ceil(y / 30)
 
-    if self.mode == "edit" then
-      if self.editor_mode == "carve" then
-        self.map[map_x][map_y] = "path"
-      elseif self.editor_mode == "fill" then
-        self.map[map_x][map_y] = "wall"
-      end
-    elseif self.mode == "play" then
-      if self.map[map_x][map_y] == "wall" then
-        self.mode = "dead"
-      elseif self.map[map_x][map_y] == "finish" then
-        self.mode = "won"
+    if map_x > 0 and map_y > 0 then
+
+      if self.mode == "edit" then
+        if self.editor_mode == "carve" then
+          self.map[map_x][map_y] = "path"
+        elseif self.editor_mode == "fill" then
+          self.map[map_x][map_y] = "wall"
+        end
+      elseif self.mode == "play" then
+        if self.map[map_x][map_y] == "wall" then
+          self.mode = "dead"
+        elseif self.map[map_x][map_y] == "finish" then
+          self.mode = "won"
+        end
       end
     end
   end
