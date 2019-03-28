@@ -1,20 +1,21 @@
 function love.load()
   assets = {
-    wall_lava = love.graphics.newImage("lava.png"),
-    wall_water = love.graphics.newImage("water.png"),
-    start_point = love.graphics.newImage("start.png"),
-    finish_point = love.graphics.newImage("goal.png"),
-    player_mouse = love.graphics.newImage("mouse.png"),
+    wall_lava = love.graphics.newImage("assets/lava.png"),
+    wall_water = love.graphics.newImage("assets/water.png"),
+    start_point = love.graphics.newImage("assets/start.png"),
+    finish_point = love.graphics.newImage("assets/goal.png"),
+    player_mouse = love.graphics.newImage("assets/mouse.png"),
     title_font = love.graphics.newFont(20),
     big_font = love.graphics.newFont(42),
     hint_font = love.graphics.newFont(16)
   }
 
   game = new_game()
+  menu_height = 60
 end
 
 function love.draw()
-  game:draw(0, 60)
+  game:draw(0, menu_height)
 end
 
 function love.keypressed(key)
@@ -24,10 +25,10 @@ function love.keypressed(key)
     game = new_game()
   elseif key == "e" then
     local mouse_x, mouse_y = love.mouse.getPosition()
-    game:place_tile_at("finish", mouse_x, mouse_y - 60)
+    game:place_tile_at("finish", mouse_x, mouse_y - menu_height)
   elseif key == "s" then
     local mouse_x, mouse_y = love.mouse.getPosition()
-    game:place_tile_at("start", mouse_x, mouse_y - 60)
+    game:place_tile_at("start", mouse_x, mouse_y - menu_height)
   end
 end
 
@@ -38,7 +39,7 @@ function love.mousepressed(x, y, button)
     game:set_editor_mode("fill")
   end
 
-  game:mouse_update(x, y - 60)
+  game:mouse_update(x, y - menu_height)
 end
 
 function love.mousereleased(x, y, button)
@@ -46,7 +47,7 @@ function love.mousereleased(x, y, button)
 end
 
 function love.mousemoved(x, y)
-  game:mouse_update(x, y - 60)
+  game:mouse_update(x, y - menu_height)
 end
 
 function new_game()
