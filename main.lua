@@ -24,10 +24,10 @@ function love.keypressed(key)
     game = new_game()
   elseif key == "e" then
     local mouse_x, mouse_y = love.mouse.getPosition()
-    game:game_place_finish(mouse_x, mouse_y - 60)
+    game:place_tile_at("finish", mouse_x, mouse_y - 60)
   elseif key == "s" then
     local mouse_x, mouse_y = love.mouse.getPosition()
-    game:game_place_start(mouse_x, mouse_y - 60)
+    game:place_tile_at("start", mouse_x, mouse_y - 60)
   end
 end
 
@@ -172,6 +172,22 @@ function new_game()
 
   function game:set_editor_mode(mode)
     self.editor_mode = mode
+  end
+
+  function game:place_tile_at(tile, x, y)
+    if self.mode == "edit" then
+      for y = 1, #self.map do
+        for x = 1, #self.map[y] do
+          if self.map[x][y] == tile then
+            self.map[x][y] = "wall"
+          end
+        end
+      end
+
+      local map_x, map_y = math.ceil(x / 30), math.ceil(y / 30)
+
+      self.map[map_x][map_y] = tile
+    end
   end
 
   function game:game_place_start(x, y)
