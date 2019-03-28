@@ -14,20 +14,20 @@ function love.load()
 end
 
 function love.draw()
-  game:draw_game(0, 60)
+  game:draw(0, 60)
 end
 
 function love.keypressed(key)
   if key == "space" then
-    game:toggle_game_mode()
+    game:toggle_mode()
   elseif key == "r" then
     game = new_game()
   elseif key == "e" then
     local mouse_x, mouse_y = love.mouse.getPosition()
-    game:game_place_finish(mouse_x, mouse_y - 60)
+    game:place_tile_at("finish", mouse_x, mouse_y - 60)
   elseif key == "s" then
     local mouse_x, mouse_y = love.mouse.getPosition()
-    game:game_place_start(mouse_x, mouse_y - 60)
+    game:place_tile_at("start", mouse_x, mouse_y - 60)
   end
 end
 
@@ -38,7 +38,7 @@ function love.mousepressed(x, y, button)
     game:set_editor_mode("fill")
   end
 
-  game:game_mousemoved(x, y - 60)
+  game:mouse_update(x, y - 60)
 end
 
 function love.mousereleased(x, y, button)
@@ -46,7 +46,7 @@ function love.mousereleased(x, y, button)
 end
 
 function love.mousemoved(x, y)
-  game:game_mousemoved(x, y - 60)
+  game:mouse_update(x, y - 60)
 end
 
 function new_game()
@@ -68,7 +68,7 @@ function new_game()
   end
 
   -- Game drawing logic
-  function game:draw_game(game_x, game_y)
+  function game:draw(game_x, game_y)
     local window_width, window_height = love.graphics.getDimensions()
     local mouse_x, mouse_y = love.mouse.getPosition()
 
@@ -133,7 +133,7 @@ function new_game()
   end
 
 
-  function game:toggle_game_mode()
+  function game:toggle_mode()
     if self.mode == "edit" then
       self.mode = "play"
 
@@ -149,7 +149,7 @@ function new_game()
     end
   end
 
-  function game:game_mousemoved(x, y)
+  function game:mouse_update(x, y)
     local map_x, map_y = math.ceil(x / 30), math.ceil(y / 30)
 
     if map_x > 0 and map_y > 0 then
@@ -174,11 +174,11 @@ function new_game()
     self.editor_mode = mode
   end
 
-  function game:game_place_start(x, y)
+  function game:place_tile_at(tile, x, y)
     if self.mode == "edit" then
       for y = 1, #self.map do
         for x = 1, #self.map[y] do
-          if self.map[x][y] == "start" then
+          if self.map[x][y] == tile then
             self.map[x][y] = "wall"
           end
         end
@@ -186,23 +186,7 @@ function new_game()
 
       local map_x, map_y = math.ceil(x / 30), math.ceil(y / 30)
 
-      self.map[map_x][map_y] = "start"
-    end
-  end
-
-  function game:game_place_finish(x, y)
-    if self.mode == "edit" then
-      for y = 1, #self.map do
-        for x = 1, #self.map[y] do
-          if self.map[x][y] == "finish" then
-            self.map[x][y] = "wall"
-          end
-        end
-      end
-
-      local map_x, map_y = math.ceil(x / 30), math.ceil(y / 30)
-
-      self.map[map_x][map_y] = "finish"
+      self.map[map_x][map_y] = tile
     end
   end
 
