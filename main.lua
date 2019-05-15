@@ -1,20 +1,22 @@
 function love.load()
   assets = {
-    wall_lava = love.graphics.newImage("lava.png"),
-    wall_water = love.graphics.newImage("water.png"),
-    start_point = love.graphics.newImage("start.png"),
-    finish_point = love.graphics.newImage("goal.png"),
-    player_mouse = love.graphics.newImage("mouse.png"),
+    wall_lava = love.graphics.newImage("assets/lava.png"),
+    wall_water = love.graphics.newImage("assets/water.png"),
+    start_point = love.graphics.newImage("assets/start.png"),
+    finish_point = love.graphics.newImage("assets/goal.png"),
+    player_mouse = love.graphics.newImage("assets/mouse.png"),
     title_font = love.graphics.newFont(20),
     big_font = love.graphics.newFont(42),
     hint_font = love.graphics.newFont(16)
   }
 
   game = new_game()
+  menu_height = 60
+  print(is_version(0102))
 end
 
 function love.draw()
-  game:draw(0, 60)
+  game:draw(0, menu_height)
 end
 
 function love.keypressed(key)
@@ -24,11 +26,18 @@ function love.keypressed(key)
     game = new_game()
   elseif key == "e" then
     local mouse_x, mouse_y = love.mouse.getPosition()
-    game:place_tile_at("finish", mouse_x, mouse_y - 60)
+    game:place_tile_at("finish", mouse_x, mouse_y - menu_height)
   elseif key == "s" then
     local mouse_x, mouse_y = love.mouse.getPosition()
-    game:place_tile_at("start", mouse_x, mouse_y - 60)
+    game:place_tile_at("start", mouse_x, mouse_y - menu_height)
   end
+end
+
+-- return true if the current version is greater than the supplied version
+function is_version(version)
+  local vers_major, vers_minor, vers_revision, vers_codename = love.getVersion()
+  print(vers_major .. vers_minor .. vers_revision)
+  return tonumber(vers_major .. vers_minor .. vers_revision) < version
 end
 
 function love.mousepressed(x, y, button)
@@ -38,7 +47,7 @@ function love.mousepressed(x, y, button)
     game:set_editor_mode("fill")
   end
 
-  game:mouse_update(x, y - 60)
+  game:mouse_update(x, y - menu_height)
 end
 
 function love.mousereleased(x, y, button)
@@ -46,7 +55,7 @@ function love.mousereleased(x, y, button)
 end
 
 function love.mousemoved(x, y)
-  game:mouse_update(x, y - 60)
+  game:mouse_update(x, y - menu_height)
 end
 
 function new_game()
@@ -73,10 +82,20 @@ function new_game()
     local mouse_x, mouse_y = love.mouse.getPosition()
 
     -- Draw title and help text
-    love.graphics.printf("Magma Mouse Maze", assets.title_font, 0, 0, window_width, "center")
-    love.graphics.printf("Mode: " .. self.mode, assets.hint_font, 0, 0, window_width, "left")
-    love.graphics.printf("[SPACE]: Toggle editor [S]: Place start [E]: Place end [R]: Reset",
+    if is_version(0102) then
+      love.graphics.setFont(assets.title_font)
+      love.graphics.printf("Magma Mouse Maze", 0, 0, window_width, "center")
+      love.graphics.setFont(assets.hint_font)
+      love.graphics.printf("Mode: " .. self.mode, 0, 0, window_width, "left")
+      love.graphics.printf("[SPACE]: Toggle editor [S]: Place start [E]: Place end [R]: Reset",
+                                  0, 30, window_width, "center")
+    else
+      love.graphics.printf("Magma Mouse Maze", assets.title_font, 0, 0, window_width, "center")
+      love.graphics.printf("Mode: " .. self.mode, assets.hint_font, 0, 0, window_width, "left")
+      love.graphics.printf("[SPACE]: Toggle editor [S]: Place start [E]: Place end [R]: Reset",
                                 assets.hint_font, 0, 30, window_width, "center")
+    end
+
     -- Draw game map
     for y = 1, #self.map do
       for x = 1, #self.map[y] do
@@ -107,7 +126,8 @@ function new_game()
     end
 
     -- Draw edit state graphics
-    if self.mode == "edit" then
+    -- Only if the cursor is in an area that can be edited
+    if self.mode == "edit" and mouse_y > menu_height then
       local edit_box_x = math.floor(mouse_x / self.box_size) * 30
       local edit_box_y = math.floor(mouse_y / self.box_size) * 30
 
@@ -124,11 +144,21 @@ function new_game()
 
     -- Won state graphics
     if self.mode == "won" then
+      if is_version(0102) then
+      love.graphics.setFont(assets.big_font)
+      love.graphics.printf("You won!", 0, 300, window_width, "center")
+      else
       love.graphics.printf("You won!", assets.big_font, 0, 300, window_width, "center")
+      end
     end
     -- Dead state graphics
     if self.mode == "dead" then
-      love.graphics.printf("You died!", assets.big_font, 0, 300, window_width, "center")
+      if is_version(0102) then
+        love.graphics.setFont(assets.big_font)
+        love.graphics.printf("You won!", 0, 300, window_width, "center")
+        else
+        love.graphics.printf("You died!", assets.big_font, 0, 300, window_width, "center")
+        end
     end
   end
 
